@@ -23,7 +23,10 @@ rustyline = "5.0"
 rustyline-derive = "0.2"
 app_dirs = "1.2"
 yansi = "0.5"
-rtrees = {path = "../rair-core/rtrees"}
-rio = {path = "../rair-core/rio"}
 rcmd = {path = "rcmd"}
-rcore = {path = "../rair-core"}
+rtrees = {git = "https://github.com/rair-project/rair-core"}
+rio = {git = "https://github.com/rair-project/rair-core"}
+rcore = {git = "https://github.com/rair-project/rair-core"}
+#rtrees = {path = "../rair-core/rtrees"}
+#rio = {path = "../rair-core/rio"}
+#rcore = {path = "../rair-core"}
