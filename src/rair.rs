@@ -86,30 +86,32 @@ fn main() {
         let hndl = core.io.open(uri, perm).unwrap_or_else(|e| panic_msg(&mut core, &e.to_string(), ""));
         core.set_loc(core.io.hndl_to_desc(hndl).unwrap().paddr_base());
     }
+    promt_read_parse_evaluate_loop(&mut core, &mut rl);
+}
+fn promt_read_parse_evaluate_loop(core: &mut Core, lr: &mut Editor<LineFormatter>) -> ! {
     loop {
-        repl_inners(&mut core, &mut rl);
+        let prelude = &format!("[0x{:08x}]({})> ", core.get_loc(), core.mode);
+        let (r, g, b) = core.env.borrow().get_color("color.2").unwrap();
+        let input = lr.readline(&format!("{}", Paint::rgb(r, g, b, prelude)));
+        match &input {
+            Ok(line) => {
+                lr.add_history_entry(line);
+                lr.save_history(&hist_file()).unwrap();
+                parse_evaluate(core, line)
+            }
+            Err(ReadlineError::Interrupted) => writeln!(core.stdout, "CTRL-C").unwrap(),
+            Err(ReadlineError::Eof) => std::process::exit(0),
+            Err(err) => writeln!(core.stdout, "Error: {:?}", err).unwrap(),
+        }
     }
 }
-
-fn repl_inners(core: &mut Core, rl: &mut Editor<LineFormatter>) {
-    let prelude = &format!("[0x{:08x}]({})> ", core.get_loc(), core.mode);
-    let (r, g, b) = core.env.borrow().get_color("color.2").unwrap();
-    let input = rl.readline(&format!("{}", Paint::rgb(r, g, b, prelude)));
-    match &input {
-        Ok(line) => {
-            rl.add_history_entry(line);
-            let t = ParseTree::construct(line);
-            if let Ok(tree) = t {
-                evaluate(core, tree);
-            } else {
-                writeln!(core.stderr, "{}", t.err().unwrap().to_string()).unwrap();
-            }
-        }
-        Err(ReadlineError::Interrupted) => writeln!(core.stdout, "CTRL-C").unwrap(),
-        Err(ReadlineError::Eof) => std::process::exit(0),
-        Err(err) => writeln!(core.stdout, "Error: {:?}", err).unwrap(),
+fn parse_evaluate(core: &mut Core, line: &str) {
+    let t = ParseTree::construct(line);
+    if let Ok(tree) = t {
+        evaluate(core, tree);
+    } else {
+        writeln!(core.stderr, "{}", t.err().unwrap().to_string()).unwrap();
     }
-    rl.save_history(&hist_file()).unwrap();
 }
 
 fn evaluate(core: &mut Core, tree: ParseTree) {
