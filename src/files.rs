@@ -24,3 +24,14 @@ pub fn hist_file() -> PathBuf {
     history.push("history");
     return history;
 }
+
+#[cfg(test)]
+
+mod test_files {
+    use super::*;
+    #[test]
+    fn test_history() {
+        let hist = hist_file();
+        assert!(hist.ends_with("history"));
+    }
+}
