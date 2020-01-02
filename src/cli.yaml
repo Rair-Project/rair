@@ -5,12 +5,16 @@ args:
         long: perm
         help: "File permision: Permission can be R, C, or RW case insensitive, the default is R"
         takes_value: true
-    - Paddr:
-        short: P
-        long: phy
+    - Base:
+        short: b
+        long: base
         help: "Physical Base address"
+        takes_value: true
+    - Project:
+        short: P
+        long: proj
+        help: "Project to be opened"
         takes_value: true
     - File:
         help: Binary file to be loaded
-        required: true
         takes_value: true
