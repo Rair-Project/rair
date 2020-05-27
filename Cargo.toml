@@ -23,6 +23,7 @@ rustyline = "5.0"
 rustyline-derive = "0.2"
 app_dirs = "1.2"
 yansi = "0.5"
+self_update = "0.15.0"
 rcmd = {path = "rcmd"}
 rtrees = {git = "https://github.com/rair-project/rair-core"}
 rair-io = {git = "https://github.com/rair-project/rair-core"}

@@ -27,6 +27,7 @@ extern crate rtrees;
 extern crate rustyline;
 extern crate rustyline_derive;
 extern crate yansi;
+extern crate self_update;
 
 mod files;
 mod init;
@@ -39,6 +40,8 @@ use rair_io::IoMode;
 use rcore::{panic_msg, str_to_num, Core, Writer};
 use rpel::*;
 use std::mem;
+use self_update::cargo_crate_version;
+
 
 enum Matches {
     Project,
@@ -100,6 +103,19 @@ fn match_project(core: &mut Core, matches: &ArgMatches) {
         panic_msg(core, "", &err_buf);
     }
 }
+fn check_update() -> Result<(), Box<::std::error::Error>> {
+    let releases = self_update::backends::github::ReleaseList::configure()
+        .repo_owner("Rair-Project")
+        .repo_name("rair")
+        .build()?
+        .fetch()?;
+    if releases.len() > 0  {
+        println!("New release:");
+        println!("{:#?}\n", releases);
+    }
+    Ok(())
+    
+}
 fn main() {
     let mut core = Core::new();
     let yaml = load_yaml!("cli.yaml");
@@ -110,5 +126,6 @@ fn main() {
         Matches::File => match_file(&mut core, &matches),
         Matches::Project => match_project(&mut core, &matches),
     }
+    check_update();
     prompt_read_parse_evaluate_loop(core, editor);
 }
